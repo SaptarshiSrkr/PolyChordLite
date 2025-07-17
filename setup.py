@@ -79,10 +79,10 @@ class CustomBuildPy(_build_py, object):
         if self.distribution.no_mpi is None:
             env["MPI"] = "1"
             # These need to be set so that build_ext uses the right compilers
-            cc_compiler = subprocess.check_output(["make", "print_CC"]).decode('utf-8').strip()
+            cc_compiler = subprocess.check_output(["make", "print_CC", "COMPILER_TYPE=gnu"]).decode('utf-8').strip()
             os.environ["CC"] = cc_compiler
 
-            cxx_compiler = subprocess.check_output(["make", "print_CXX"]).decode('utf-8').strip()
+            cxx_compiler = subprocess.check_output(["make", "print_CXX", "COMPILER_TYPE=gnu"]).decode('utf-8').strip()
             os.environ["CXX"] = cxx_compiler
         else:
             env["MPI"] = "0"
@@ -94,7 +94,7 @@ class CustomBuildPy(_build_py, object):
         BASE_PATH = os.path.dirname(os.path.abspath(__file__))
         env["CURDIR"] = BASE_PATH
         env.update({k : os.environ[k] for k in ["CC", "CXX", "FC"] if k in os.environ})
-        subprocess.check_call(["make", "-e", "libchord.so"], env=env, cwd=BASE_PATH)
+        subprocess.check_call(["make", "-e", "libchord.so", "COMPILER_TYPE=gnu"], env=env, cwd=BASE_PATH)
         if not os.path.isdir("pypolychord/lib/"):
             os.makedirs(os.path.join(BASE_PATH, "pypolychord/lib/"))
         shutil.copy(os.path.join(BASE_PATH, "lib/libchord.so"), 
